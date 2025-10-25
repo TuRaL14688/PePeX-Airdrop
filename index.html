@@ -125,6 +125,7 @@
 </div>
 
 <script>
+    // Countdown
     let daysLeft = 10;
 
     function updateCountdown() {
@@ -133,18 +134,12 @@
 
     function getNextAZTMidnight() {
         const now = new Date();
-        const utcHour = now.getUTCHours();
-        const utcMinute = now.getUTCMinutes();
-        const utcSecond = now.getUTCSeconds();
-
-        const nowUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), utcHour, utcMinute, utcSecond));
+        const nowUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()));
         let midnightAZT = new Date(nowUTC);
-        midnightAZT.setUTCHours(20, 0, 0, 0); // 24:00 AZT = 20:00 UTC
-
+        midnightAZT.setUTCHours(20, 0, 0, 0);
         if (nowUTC >= midnightAZT) {
             midnightAZT.setUTCDate(midnightAZT.getUTCDate() + 1);
         }
-
         return midnightAZT;
     }
 
@@ -161,7 +156,18 @@
     updateCountdown();
     scheduleCountdown();
 
-    const submittedAddresses = new Set();
+    // LocalStorage participation
+    const participationKey = "ppx_participation";
+    const storedAddress = localStorage.getItem(participationKey);
+
+    function showParticipationStatus() {
+        if (storedAddress) {
+            document.getElementById('participationArea').style.display = "none";
+            document.getElementById('alreadyMsg').style.display = "block";
+        }
+    }
+
+    showParticipationStatus();
 
     document.getElementById('submitBtn').addEventListener('click', () => {
         const address = document.getElementById('address').value.trim();
@@ -169,13 +175,13 @@
             alert("Please enter your TON address.");
             return;
         }
-        if (submittedAddresses.has(address)) {
+        if (localStorage.getItem(participationKey)) {
             document.getElementById('participationArea').style.display = "none";
             document.getElementById('alreadyMsg').style.display = "block";
             return;
         }
-
-        submittedAddresses.add(address);
+        // Save to LocalStorage
+        localStorage.setItem(participationKey, address);
         document.getElementById('participationArea').style.display = "none";
         document.getElementById('successMsg').style.display = "block";
     });
