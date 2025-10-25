@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$PPX Airdrop</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Orbitron', sans-serif;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+        background: linear-gradient(135deg, #1a2a6c, #1a73e8, #5ac8fa);
+        background-size: 600% 600%;
+        animation: gradientBG 20s ease infinite;
+    }
+
+    @keyframes gradientBG {
+        0%{background-position:0% 50%;}
+        50%{background-position:100% 50%;}
+        100%{background-position:0% 50%;}
+    }
+
+    h1 {
+        font-size: 3rem;
+        background: linear-gradient(90deg, #6ec6ff, #00bfff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: glow 2s infinite alternate;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    @keyframes glow {
+        0% { text-shadow: 0 0 10px #6ec6ff, 0 0 20px #00bfff; }
+        100% { text-shadow: 0 0 20px #6ec6ff, 0 0 40px #00bfff; }
+    }
+
+    .countdown {
+        font-size: 2rem;
+        margin: 20px 0;
+        color: #80d4ff;
+        text-shadow: 0 0 5px #80d4ff, 0 0 10px #80d4ff;
+    }
+
+    .info {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        color: #cce6ff;
+        text-align: center;
+        line-height: 1.5;
+        text-shadow: 0 0 3px #cce6ff, 0 0 6px #cce6ff;
+    }
+
+    input[type="text"] {
+        padding: 10px;
+        font-size: 1rem;
+        border-radius: 8px;
+        border: none;
+        width: 300px;
+        max-width: 80%;
+        margin-bottom: 10px;
+        outline: none;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #00bfff, #6ec6ff);
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s, background 2s;
+        background-size: 600% 600%;
+        animation: buttonGradient 5s ease infinite;
+    }
+
+    button:hover {
+        transform: scale(1.05);
+    }
+
+    @keyframes buttonGradient {
+        0%{background-position:0% 50%;}
+        50%{background-position:100% 50%;}
+        100%{background-position:0% 50%;}
+    }
+
+    .success {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #99e6ff;
+        text-shadow: 0 0 5px #99e6ff, 0 0 10px #99e6ff;
+    }
+</style>
+</head>
+<body>
+
+<h1>$PPX Airdrop</h1>
+<div class="info">
+    10,000,000 $PPX will be distributed<br>
+    The more $PPX you hold in your wallet, the more $PPX airdrop you will receive.
+</div>
+<div class="countdown" id="countdown">10 Days Left</div>
+
+<div id="participationArea">
+    <input type="text" id="address" placeholder="Enter your TON address">
+    <button id="submitBtn">Participate</button>
+</div>
+
+<div class="success" id="successMsg" style="display:none;">
+    You have successfully participated in $PPX Airdrop!
+</div>
+
+<div class="success" id="alreadyMsg" style="display:none;">
+    You have already participated.
+</div>
+
+<script>
+    let daysLeft = 10;
+
+    function updateCountdown() {
+        document.getElementById('countdown').innerText = daysLeft + " Days Left";
+    }
+
+    function getNextAZTMidnight() {
+        const now = new Date();
+        const utcHour = now.getUTCHours();
+        const utcMinute = now.getUTCMinutes();
+        const utcSecond = now.getUTCSeconds();
+
+        const nowUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), utcHour, utcMinute, utcSecond));
+        let midnightAZT = new Date(nowUTC);
+        midnightAZT.setUTCHours(20, 0, 0, 0); // 24:00 AZT = 20:00 UTC
+
+        if (nowUTC >= midnightAZT) {
+            midnightAZT.setUTCDate(midnightAZT.getUTCDate() + 1);
+        }
+
+        return midnightAZT;
+    }
+
+    function scheduleCountdown() {
+        const nextMidnight = getNextAZTMidnight();
+        const msUntilMidnight = nextMidnight - new Date();
+        setTimeout(() => {
+            daysLeft = Math.max(0, daysLeft - 1);
+            updateCountdown();
+            scheduleCountdown();
+        }, msUntilMidnight);
+    }
+
+    updateCountdown();
+    scheduleCountdown();
+
+    const submittedAddresses = new Set();
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+        const address = document.getElementById('address').value.trim();
+        if (!address) {
+            alert("Please enter your TON address.");
+            return;
+        }
+        if (submittedAddresses.has(address)) {
+            document.getElementById('participationArea').style.display = "none";
+            document.getElementById('alreadyMsg').style.display = "block";
+            return;
+        }
+
+        submittedAddresses.add(address);
+        document.getElementById('participationArea').style.display = "none";
+        document.getElementById('successMsg').style.display = "block";
+    });
+</script>
+
+</body>
+</html>
